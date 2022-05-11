@@ -3,7 +3,10 @@ services:
   # These are the configurations for our Node app
   # When Docker Compose starts this container it will automatically
   # use the Dockerfile in the directory to configure it
+  
   app:
+  #extrae el build o imagen de app va a depender de postgres
+  #si postgres no levanta este proyecto nuestra app tampoco lo podra levantar
     build: .
     depends_on:
       # Our app does not work without our database
@@ -12,6 +15,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
+    # sirve para en caso que el server se reinicia o algo pase,
+    # la data se mantenga
       # Maps our current project directory `.` to
       # our working directory in the container
       - ./:/usr/src/app/
@@ -19,7 +24,12 @@ services:
       # https://stackoverflow.com/a/32785014
       - /usr/src/app/node_modules
     environment:
+    # esto tambien esta en .env 
+    # en un lab anterior poniamos localhost, pero aqui como es docker no hace falta
+    # poner localhost, pq esta imagen "postgres" viene a ser lo q esta
+    # en la linea 38 "postgres:"
       - DATABASE_URL="postgresql://root:root@postgres:5432/mydb?schema=public"
+      # default port=8080
       - PORT=8080
 
   # This is the configuration for our PostgreSQL database container
@@ -27,6 +37,7 @@ services:
   # to  `host: "postgres"` that value is mapped on the network to the 
   # address of this container.
   postgres:
+  # crea una red interna de docker y la asigna a una ip
     image: postgres:14.1-alpine
     restart: always
     environment:
@@ -40,7 +51,7 @@ services:
     ports:
       # Standard port for PostgreSQL databases
       - "5432:5432"
-
+# opcional:
   # PostgreSQL pgAdmin panel accessible at http://localhost:16543/
   pgadmin-compose:
     image: dpage/pgadmin4
@@ -48,6 +59,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: "linder@gmail.com"
       PGADMIN_DEFAULT_PASSWORD: "linder340!"
     ports:
+    # pgadmin se abre en el puerto:...
       - "16543:80"
     depends_on:
       - postgres
