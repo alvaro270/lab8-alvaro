@@ -18,13 +18,15 @@ jobs:
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
+        # se conecta con la maquina virtual
           host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.SSH_KEY }}
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           script_stop: true
+          # luego de conectarse se va a la carpeta "lab8-alvaro"
           script: |
-            cd /root/repos/skeleton-node-ms
+            cd /home/ubuntu/repos/lab8-alvaro
             git pull origin main
             docker-compose restart
             echo "ok"
